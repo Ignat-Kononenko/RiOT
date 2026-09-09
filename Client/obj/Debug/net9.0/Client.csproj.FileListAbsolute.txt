@@ -1,0 +1,14 @@
+D:\labs\7semester\RiOT\labs\lab1\Client\bin\Debug\net9.0\Client.exe
+D:\labs\7semester\RiOT\labs\lab1\Client\bin\Debug\net9.0\Client.deps.json
+D:\labs\7semester\RiOT\labs\lab1\Client\bin\Debug\net9.0\Client.runtimeconfig.json
+D:\labs\7semester\RiOT\labs\lab1\Client\bin\Debug\net9.0\Client.dll
+D:\labs\7semester\RiOT\labs\lab1\Client\bin\Debug\net9.0\Client.pdb
+D:\labs\7semester\RiOT\labs\lab1\Client\obj\Debug\net9.0\Client.GeneratedMSBuildEditorConfig.editorconfig
+D:\labs\7semester\RiOT\labs\lab1\Client\obj\Debug\net9.0\Client.AssemblyInfoInputs.cache
+D:\labs\7semester\RiOT\labs\lab1\Client\obj\Debug\net9.0\Client.AssemblyInfo.cs
+D:\labs\7semester\RiOT\labs\lab1\Client\obj\Debug\net9.0\Client.csproj.CoreCompileInputs.cache
+D:\labs\7semester\RiOT\labs\lab1\Client\obj\Debug\net9.0\Client.dll
+D:\labs\7semester\RiOT\labs\lab1\Client\obj\Debug\net9.0\refint\Client.dll
+D:\labs\7semester\RiOT\labs\lab1\Client\obj\Debug\net9.0\Client.pdb
+D:\labs\7semester\RiOT\labs\lab1\Client\obj\Debug\net9.0\Client.genruntimeconfig.cache
+D:\labs\7semester\RiOT\labs\lab1\Client\obj\Debug\net9.0\ref\Client.dll
