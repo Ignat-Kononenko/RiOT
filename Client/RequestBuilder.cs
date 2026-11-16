@@ -21,6 +21,7 @@ namespace FitnessClient
                 return false;
             }
         }
+        
 
         private static bool IsValidPhone(string phone)
         {
@@ -29,7 +30,6 @@ namespace FitnessClient
             return cleaned.Length >= 5 && cleaned.Length <= 15;
         }
 
-        // Обобщённый метод для выбора ID из списка с отображением имени
         private static int ReadIdWithList<T>(string prompt, List<T> items)
         {
             Console.WriteLine(prompt);
@@ -134,7 +134,7 @@ namespace FitnessClient
             int trainingId;
             while (true)
             {
-                Console.Write("ID тренировки (вы получили его при бронировании): ");
+                Console.Write("ID тренировки: ");
                 if (int.TryParse(Console.ReadLine(), out trainingId) && trainingId > 0)
                     break;
                 Console.WriteLine("Введите положительное целое число.");
@@ -194,6 +194,32 @@ namespace FitnessClient
             if (DateTime.TryParse(input, out result))
                 return true;
             return false;
+        }
+
+        public static Request BuildLongOperationRequest()
+        {
+            return new Request
+            {
+                Operation = "LongOperation",
+                Data = JsonSerializer.SerializeToElement(new { })
+            };
+        }
+
+        public static Request BuildRaceConditionRequest(int clientId)
+        {
+            var data = new
+            {
+                ClientId = clientId,
+                TrainerId = 1,
+                DateTime = new DateTime(2030, 1, 1, 18, 0, 0),
+                Duration = 60
+            };
+
+            return new Request
+            {
+                Operation = "BookTraining",
+                Data = JsonSerializer.SerializeToElement(data)
+            };
         }
     }
 }

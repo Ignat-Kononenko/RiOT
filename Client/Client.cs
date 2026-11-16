@@ -7,7 +7,6 @@ using System.Collections.Generic;
 
 namespace FitnessClient
 {
-    // Модели для десериализации списков
     public class ClientInfo
     {
         public int Id { get; set; }
@@ -36,7 +35,7 @@ namespace FitnessClient
         public Client(string baseUrl = "http://localhost:5000")
         {
             _httpClient = new HttpClient();
-            _httpClient.Timeout = TimeSpan.FromSeconds(5); 
+            _httpClient.Timeout = TimeSpan.FromSeconds(30);
             _baseUrl = baseUrl;
         }
 
@@ -128,12 +127,79 @@ namespace FitnessClient
             }
             return new List<TrainerInfo>();
         }
+
+        public class TimeSyncResult
+        {
+            public DateTime RequestLocalTime { get; set; }
+            public DateTime ResponseLocalTime { get; set; }
+            public DateTime ServerTimeUtc { get; set; }
+            public TimeSpan Rtt { get; set; }
+            public TimeSpan Offset { get; set; }
+            public DateTime CorrectedTime { get; set; }
+        }
+
+        public class TimeSyncResponse
+        {
+            public DateTime ServerTimeUtc { get; set; }
+        }
+
+        public async Task<TimeSyncResult?> SyncTimeAsync(TimeSpan clockOffset)
+        {
+            try
+            {
+                var t0 = DateTime.UtcNow + clockOffset;
+
+                var request = new Request
+                {
+                    Operation = "TimeRequest",
+                    Data = JsonSerializer.SerializeToElement(new { })
+                };
+                var response = await SendRequestAsync(request);
+
+                var t1 = DateTime.UtcNow + clockOffset;
+
+                if (response.Status != "success" || response.Data == null)
+                {
+                    Console.WriteLine($"[SyncTime] Сервер вернул статус: {response.Status} — {response.Message}");
+                    return null;
+                }
+
+                var element = (JsonElement)response.Data;
+                var dto = element.Deserialize<TimeSyncResponse>(_jsonOptions);
+                if (dto == null)
+                {
+                    Console.WriteLine($"[SyncTime] Не удалось разобрать данные: {element.GetRawText()}");
+                    return null;
+                }
+
+                var serverTime = dto.ServerTimeUtc;
+                var rtt = t1 - t0;
+                var offset = serverTime - t0 - TimeSpan.FromTicks(rtt.Ticks / 2);
+                var corrected = t1 + offset;
+
+                return new TimeSyncResult
+                {
+                    RequestLocalTime = t0,
+                    ResponseLocalTime = t1,
+                    ServerTimeUtc = serverTime,
+                    Rtt = rtt,
+                    Offset = offset,
+                    CorrectedTime = corrected
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SyncTime] Исключение: {ex.GetType().Name}: {ex.Message}");
+                return null;
+            }
+        }
     }
 
     public class Request
     {
         public string Operation { get; set; } = string.Empty;
         public JsonElement? Data { get; set; }
+        public int ClientId { get; set; }
     }
 
     public class Response

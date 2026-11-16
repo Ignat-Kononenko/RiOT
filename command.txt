@@ -1,0 +1,76 @@
+dotnet run --project Server -- recreate
+
+dotnet run --project Client -- 1 0
+dotnet run --project Client -- 2 0
+
+dotnet run --project Server -- lock
+dotnet run --project Server -- semaphore
+
+
+docker exec -it mssql-riot /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P YourStrong@Password123 -C -d FitnessDB_Replica -Q "SELECT Id, TrainerId, AvailablePlaces FROM TrainingSlots"
+
+docker exec -it mssql-riot /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P YourStrong@Password123 -C -d FitnessDB_Primary -Q "SELECT Id, TrainerId, AvailablePlaces FROM TrainingSlots"
+
+---
+
+docker exec -it mssql-riot /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P YourStrong@Password123 -C -d FitnessDB_Replica -Q "SELECT COUNT(*) FROM Clients"
+
+docker exec -it mssql-riot /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P YourStrong@Password123 -C -d FitnessDB_Primary -Q "SELECT COUNT(*) FROM Clients"
+
+---
+
+2030-01-01 18:30
+30
+
+2030-01-02 18:00 1
+ 
+2030-01-03 18:00 1
+
+2030-01-04 18:00 1
+
+2030-01-02 19:00 2
+
+2030-01-03 19:00 2
+
+----
+
+32 - 25 - 26 - 29 - 34 - 27 - 5 - 30 - 34 - 35 - 33
+
+----------
+
+1-2-12-3-4
+24 - 25 - 29 - 33 -34 -35
+
+--------------------------
+
+kubectl get pods
+
+kubectl logs fitness-server-6cc96c8786-xbfxz
+
+kubectl port-forward service/fitness-server 5000:5000
+dotnet run --project Client
+
+1-2-9
+
+kubectl scale deployment fitness-server --replicas=3
+
+kubectl scale deployment fitness-server --replicas=2
+kubectl get pods -l app=fitness-server
+
+kubectl delete pod <имя-любого-пода>
+kubectl get pods -l app=fitness-server
+
+kubectl set image deployment/fitness-server server=fitness-server:broken-tag
+kubectl get pods -l app=fitness-server
+kubectl describe pod <имя-застрявшего-пода>
+
+kubectl set image deployment/fitness-server server=fitness-server:1.0
+kubectl rollout status deployment/fitness-server
+kubectl get pods
+
+-----------------------------
+
+git add Jenkinsfile
+git commit -m "Lab10: добавлен этап Package для сборки Docker-образа"
+git push
+

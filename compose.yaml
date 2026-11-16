@@ -1,0 +1,44 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: fitness-mssql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+      MSSQL_PID: "Developer"
+    ports:
+      - "14330:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    networks:
+      - fitness-net
+    restart: unless-stopped
+
+  server:
+    build:
+      context: ./Server
+      dockerfile: Dockerfile
+    container_name: fitness-server
+    environment:
+      APP_URL: "http://0.0.0.0:5000"
+      DB_HOST: "mssql"
+      DB_PORT: "1433"
+      DB_USER: "sa"
+      DB_PASSWORD: "${MSSQL_SA_PASSWORD}"
+      DB_PRIMARY_NAME: "FitnessDB_Primary"
+      DB_REPLICA_NAME: "FitnessDB_Replica"
+      DB_WAIT_ATTEMPTS: "60"
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mssql
+    networks:
+      - fitness-net
+    restart: on-failure
+
+volumes:
+  mssql_data:
+
+networks:
+  fitness-net:
+    driver: bridge

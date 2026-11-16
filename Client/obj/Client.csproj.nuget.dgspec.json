@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Client\\Client.csproj": {}
+    "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Client\\Client.csproj": {}
   },
   "projects": {
-    "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Client\\Client.csproj": {
+    "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Client\\Client.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Client\\Client.csproj",
+        "projectUniqueName": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Client\\Client.csproj",
         "projectName": "Client",
-        "projectPath": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Client\\Client.csproj",
+        "projectPath": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Client\\Client.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Client\\obj\\",
+        "outputPath": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Client\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",

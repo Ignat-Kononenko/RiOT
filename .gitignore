@@ -2,3 +2,9 @@ echo "bin/" > .gitignore
 echo "obj/" >> .gitignore
 echo ".vs/" >> .gitignore
 echo "*.user" >> .gitignore
+
+.env
+*.user
+bin/
+obj/
+.vs/

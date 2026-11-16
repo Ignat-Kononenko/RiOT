@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\labs\\7semester\\RiOT\\labs\\lab1\\FitnessServer.Tests\\FitnessServer.Tests.csproj": {}
+    "D:\\labs\\7semester\\RiOT\\labs\\lab10\\FitnessServer.Tests\\FitnessServer.Tests.csproj": {}
   },
   "projects": {
-    "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Client\\Client.csproj": {
+    "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Client\\Client.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Client\\Client.csproj",
+        "projectUniqueName": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Client\\Client.csproj",
         "projectName": "Client",
-        "projectPath": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Client\\Client.csproj",
+        "projectPath": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Client\\Client.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Client\\obj\\",
+        "outputPath": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Client\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -67,14 +67,14 @@
         }
       }
     },
-    "D:\\labs\\7semester\\RiOT\\labs\\lab1\\FitnessServer.Tests\\FitnessServer.Tests.csproj": {
+    "D:\\labs\\7semester\\RiOT\\labs\\lab10\\FitnessServer.Tests\\FitnessServer.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\FitnessServer.Tests\\FitnessServer.Tests.csproj",
+        "projectUniqueName": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\FitnessServer.Tests\\FitnessServer.Tests.csproj",
         "projectName": "FitnessServer.Tests",
-        "projectPath": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\FitnessServer.Tests\\FitnessServer.Tests.csproj",
+        "projectPath": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\FitnessServer.Tests\\FitnessServer.Tests.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\FitnessServer.Tests\\obj\\",
+        "outputPath": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\FitnessServer.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -93,11 +93,11 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Client\\Client.csproj": {
-                "projectPath": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Client\\Client.csproj"
+              "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Client\\Client.csproj": {
+                "projectPath": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Client\\Client.csproj"
               },
-              "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Server\\Server.csproj": {
-                "projectPath": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Server\\Server.csproj"
+              "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Server\\Server.csproj": {
+                "projectPath": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Server\\Server.csproj"
               }
             }
           }
@@ -159,14 +159,14 @@
         }
       }
     },
-    "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Server\\Server.csproj": {
+    "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Server\\Server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Server\\Server.csproj",
+        "projectUniqueName": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Server\\Server.csproj",
         "projectName": "Server",
-        "projectPath": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Server\\Server.csproj",
+        "projectPath": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Server\\Server.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "D:\\labs\\7semester\\RiOT\\labs\\lab1\\Server\\obj\\",
+        "outputPath": "D:\\labs\\7semester\\RiOT\\labs\\lab10\\Server\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -202,6 +202,12 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[5.2.2, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fitness-server
+  labels:
+    app: fitness-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fitness-server
+  template:
+    metadata:
+      labels:
+        app: fitness-server
+    spec:
+      containers:
+        - name: server
+          image: fitness-server:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:
+            - name: APP_URL
+              value: "http://0.0.0.0:5000"
+            - name: APP_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: fitness-config
+                  key: APP_MODE
+            - name: DB_HOST
+              value: "fitness-mssql"
+            - name: DB_PORT
+              value: "1433"
+            - name: DB_USER
+              value: "sa"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mssql-secret
+                  key: DB_PASSWORD
+            - name: DB_PRIMARY_NAME
+              value: "FitnessDB_Primary"
+            - name: DB_REPLICA_NAME
+              value: "FitnessDB_Replica"
+            - name: DB_WAIT_ATTEMPTS
+              value: "60"
+          readinessProbe:
+            tcpSocket:
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 5
