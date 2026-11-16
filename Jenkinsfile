@@ -22,6 +22,9 @@ pipeline {
         IMAGE_NAME = 'riot-server'
         DEPLOYMENT_NAME = 'fitness-server'
         CONTAINER_NAME = 'server'
+        
+        // Указываем путь к конфигу Kubernetes вашего пользователя Windows
+        KUBECONFIG = 'C:\\Users\\User\\.kube\\config'
     }
 
     stages {
@@ -110,10 +113,10 @@ pipeline {
 
     post {
         success {
-            echo " Pipeline успешно завершен! Приложение развернуто в Kubernetes."
+            echo "Pipeline успешно завершен! Приложение развернуто в Kubernetes."
         }
         failure {
-            echo " Pipeline завершился с ошибкой. Проверьте логи."
+            echo "Pipeline завершился с ошибкой. Проверьте логи."
         }
     }
 }
