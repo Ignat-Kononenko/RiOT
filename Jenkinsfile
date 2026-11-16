@@ -47,15 +47,31 @@ pipeline {
             }
         }
 
+        stage('Start DB') {
+            steps {
+                script {
+                    // Поднимаем контейнеры с базой данных в фоне
+                    runCmd "docker compose up -d"
+                    // Ждем 15 секунд, чтобы SQL Server успел запуститься внутри контейнера
+                    if (isUnix()) {
+                        sh "sleep 15"
+                    } else {
+                        bat "powershell -Command \"Start-Sleep -Seconds 15\""
+                    }
+                }
+            }
+        }
+
         stage('Test') {
             steps {
                 script {
-                    runCmd "dotnet test ${env.TESTS_PROJECT} --configuration Release --no-build --no-restore --logger \"trx;LogFileName=test_results.trx\""
+                    runCmd "dotnet test ${env.TESTS_PROJECT} --configuration Release --no-build --no-restore"
                 }
             }
             post {
                 always {
-                    junit allowEmptyResults: true, testResults: '**/TestResults/*.trx'
+                    // Останавливаем контейнеры после тестов, чтобы не засорять систему
+                    runCmd "docker compose down"
                 }
             }
         }
@@ -63,10 +79,9 @@ pipeline {
         stage('Package') {
             steps {
                 script {
-                    // Сборка образа. Контекст - папка Server, Dockerfile лежит там же
-                    runCmd "docker build -t ${env.IMAGE_NAME}:${env.BUILD_NUMBER} -f Server/Dockerfile Server"
-                    
-                    // Вывод списка образов для проверки
+                    dir('Server') {
+                        runCmd "docker build -t ${env.IMAGE_NAME}:${env.BUILD_NUMBER} ."
+                    }
                     runCmd "docker images ${env.IMAGE_NAME}"
                 }
             }
