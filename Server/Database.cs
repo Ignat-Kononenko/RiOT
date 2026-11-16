@@ -3,7 +3,6 @@ using Microsoft.Data.SqlClient;
 
 namespace FitnessServer
 {
-
     public enum InstanceRole { Primary, Replica }
 
     public class InstanceUnavailableException : Exception
@@ -13,6 +12,8 @@ namespace FitnessServer
 
     public static class Database
     {
+        // Блокировка для предотвращения конфликтов при параллельном запуске тестов
+        private static readonly object _dbLock = new object();
 
         public static string PrimaryConnectionString { get; set; } =
             BuildConnectionString(GetEnv("DB_PRIMARY_NAME", "FitnessDB_Primary"));
@@ -77,7 +78,6 @@ namespace FitnessServer
 
         public static SqlConnection OpenConnection() => OpenConnection(ActiveRole);
 
-
         public static void FailoverToReplica()
         {
             if (!IsAvailable(InstanceRole.Replica))
@@ -94,7 +94,6 @@ namespace FitnessServer
 
             if (IsAvailable(InstanceRole.Primary) && IsAvailable(InstanceRole.Replica))
             {
-
                 if (ActiveRole == InstanceRole.Replica)
                 {
                     try { SyncReplicaToPrimary(); }
@@ -195,11 +194,13 @@ namespace FitnessServer
             }
         }
 
-
         public static void Initialize(bool recreate = false)
         {
-            InitializeInstance(InstanceRole.Primary, recreate);
-            InitializeInstance(InstanceRole.Replica, recreate);
+            lock (_dbLock) // Защита от параллельных тестов
+            {
+                InitializeInstance(InstanceRole.Primary, recreate);
+                InitializeInstance(InstanceRole.Replica, recreate);
+            }
         }
 
         private static void InitializeInstance(InstanceRole role, bool recreate)
@@ -293,23 +294,22 @@ namespace FitnessServer
             createTables.ExecuteNonQuery();
         }
 
-
         public static void Seed()
         {
-            SeedInstance(InstanceRole.Primary);
-            try { SyncPrimaryToReplica(); } catch {  }
+            lock (_dbLock) // Защита от параллельных тестов
+            {
+                SeedInstance(InstanceRole.Primary);
+                try { SyncPrimaryToReplica(); } catch { }
+            }
         }
 
         private static void SeedInstance(InstanceRole role)
         {
+            // ПРИНУДИТЕЛЬНАЯ ОЧИСТКА: Гарантирует, что ID тренеров начнутся с 1
+            ResetInstance(role);
+
             using var conn = new SqlConnection(GetConnectionString(role));
             conn.Open();
-
-            using (var check = conn.CreateCommand())
-            {
-                check.CommandText = "SELECT COUNT(*) FROM Trainers;";
-                if (Convert.ToInt32(check.ExecuteScalar()) > 0) return;
-            }
 
             InsertTrainer(conn, "Алексей", "Йога");
             InsertTrainer(conn, "Мария", "Фитнес");
@@ -318,7 +318,6 @@ namespace FitnessServer
             InsertClient(conn, "Петр", "petr@test.ru", "+375292333445");
 
             // Слот 1: 1 место — используется тестами ЛР4/ЛР5 (race condition, lock, semaphore).
-            // НЕ МЕНЯТЬ дату и количество мест!
             AddSlot(conn, 1, new DateTime(2030, 1, 1, 18, 0, 0), 1);
 
             // Дополнительные слоты для демонстрации ЛР6 (Pub/Sub)
@@ -331,8 +330,11 @@ namespace FitnessServer
 
         public static void Reset()
         {
-            ResetInstance(InstanceRole.Primary);
-            ResetInstance(InstanceRole.Replica);
+            lock (_dbLock) // Защита от параллельных тестов
+            {
+                ResetInstance(InstanceRole.Primary);
+                ResetInstance(InstanceRole.Replica);
+            }
         }
 
         private static void ResetInstance(InstanceRole role)
@@ -387,7 +389,6 @@ namespace FitnessServer
             slot.Parameters.AddWithValue("@p", places);
             slot.ExecuteNonQuery();
         }
-
 
         public static int GetAvailablePlaces(int slotId)
         {
