@@ -20,8 +20,8 @@ pipeline {
         SERVER_PROJECT = 'Server/Server.csproj'
         TESTS_PROJECT = 'FitnessServer.Tests/FitnessServer.Tests.csproj'
         IMAGE_NAME = 'riot-server'
-        DEPLOYMENT_NAME = 'fitness-server'  // Имя вашего Deployment в K8s
-        CONTAINER_NAME = 'server'           // Имя контейнера внутри Deployment
+        DEPLOYMENT_NAME = 'fitness-server'
+        CONTAINER_NAME = 'server'
     }
 
     stages {
@@ -50,9 +50,17 @@ pipeline {
         stage('Start DB') {
             steps {
                 script {
-                    runCmd "docker compose down"
+                    // 1. Принудительно удаляем старый контейнер (если он есть)
+                    if (isUnix()) {
+                        sh "docker rm -f fitness-mssql || true"
+                    } else {
+                        bat "docker rm -f fitness-mssql 2>NUL || exit 0"
+                    }
+                    
+                    // 2. Поднимаем базу данных заново
                     runCmd "docker compose up -d mssql"
                     
+                    // 3. Ждем запуска
                     if (isUnix()) {
                         sh "sleep 20"
                     } else {
@@ -70,8 +78,11 @@ pipeline {
             }
             post {
                 always {
-                    // Останавливаем БД, так как тесты прошли (или упали)
-                    runCmd "docker compose down"
+                    if (isUnix()) {
+                        sh "docker rm -f fitness-mssql || true"
+                    } else {
+                        bat "docker rm -f fitness-mssql 2>NUL || exit 0"
+                    }
                 }
             }
         }
@@ -79,7 +90,6 @@ pipeline {
         stage('Package') {
             steps {
                 script {
-                    // Собираем Docker-образ с уникальным тегом (номером сборки)
                     dir('Server') {
                         runCmd "docker build -t ${env.IMAGE_NAME}:${env.BUILD_NUMBER} ."
                     }
@@ -91,13 +101,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Обновляем образ в Kubernetes
                     runCmd "kubectl set image deployment/${env.DEPLOYMENT_NAME} ${env.CONTAINER_NAME}=${env.IMAGE_NAME}:${env.BUILD_NUMBER}"
-                    
-                    // Ждем, пока Kubernetes обновит поды
                     runCmd "kubectl rollout status deployment/${env.DEPLOYMENT_NAME} --timeout=120s"
-                    
-                    // Проверяем, что поды запустились
                     runCmd "kubectl get pods"
                 }
             }
