@@ -50,17 +50,14 @@ pipeline {
         stage('Start DB') {
             steps {
                 script {
-                    // 1. Принудительно удаляем старый контейнер (если он есть)
                     if (isUnix()) {
                         sh "docker rm -f fitness-mssql || true"
                     } else {
-                        bat "docker rm -f fitness-mssql 2>NUL || exit 0"
+                        bat script: "docker rm -f fitness-mssql", returnStatus: true
                     }
                     
-                    // 2. Поднимаем базу данных заново
                     runCmd "docker compose up -d mssql"
                     
-                    // 3. Ждем запуска
                     if (isUnix()) {
                         sh "sleep 20"
                     } else {
@@ -78,10 +75,12 @@ pipeline {
             }
             post {
                 always {
-                    if (isUnix()) {
-                        sh "docker rm -f fitness-mssql || true"
-                    } else {
-                        bat "docker rm -f fitness-mssql 2>NUL || exit 0"
+                    script {
+                        if (isUnix()) {
+                            sh "docker rm -f fitness-mssql || true"
+                        } else {
+                            bat script: "docker rm -f fitness-mssql", returnStatus: true
+                        }
                     }
                 }
             }
@@ -111,10 +110,10 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline успешно завершен! Приложение развернуто в Kubernetes."
+            echo " Pipeline успешно завершен! Приложение развернуто в Kubernetes."
         }
         failure {
-            echo "Pipeline завершился с ошибкой. Проверьте логи."
+            echo " Pipeline завершился с ошибкой. Проверьте логи."
         }
     }
 }
