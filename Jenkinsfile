@@ -20,8 +20,8 @@ pipeline {
         SERVER_PROJECT = 'Server/Server.csproj'
         TESTS_PROJECT = 'FitnessServer.Tests/FitnessServer.Tests.csproj'
         IMAGE_NAME = 'riot-server'
-        // Добавляем пароль на всякий случай прямо в окружение
-        MSSQL_SA_PASSWORD = 'YourStrong@Password123' 
+        DEPLOYMENT_NAME = 'fitness-server'  // Имя вашего Deployment в K8s
+        CONTAINER_NAME = 'server'           // Имя контейнера внутри Deployment
     }
 
     stages {
@@ -50,14 +50,13 @@ pipeline {
         stage('Start DB') {
             steps {
                 script {
-                    // ВАЖНО: Замените "sqlserver" на точное имя сервиса БД из вашего compose.yaml!
-                    // Если их два, напишите через пробел: docker compose up -d db-primary db-replica
-                    runCmd "docker compose up -d sqlserver"
+                    runCmd "docker compose down"
+                    runCmd "docker compose up -d mssql"
                     
                     if (isUnix()) {
-                        sh "sleep 15"
+                        sh "sleep 20"
                     } else {
-                        bat "powershell -Command \"Start-Sleep -Seconds 15\""
+                        bat "powershell -Command \"Start-Sleep -Seconds 20\""
                     }
                 }
             }
@@ -71,6 +70,7 @@ pipeline {
             }
             post {
                 always {
+                    // Останавливаем БД, так как тесты прошли (или упали)
                     runCmd "docker compose down"
                 }
             }
@@ -79,11 +79,37 @@ pipeline {
         stage('Package') {
             steps {
                 script {
+                    // Собираем Docker-образ с уникальным тегом (номером сборки)
                     dir('Server') {
                         runCmd "docker build -t ${env.IMAGE_NAME}:${env.BUILD_NUMBER} ."
                     }
+                    runCmd "docker images ${env.IMAGE_NAME}"
                 }
             }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    // Обновляем образ в Kubernetes
+                    runCmd "kubectl set image deployment/${env.DEPLOYMENT_NAME} ${env.CONTAINER_NAME}=${env.IMAGE_NAME}:${env.BUILD_NUMBER}"
+                    
+                    // Ждем, пока Kubernetes обновит поды
+                    runCmd "kubectl rollout status deployment/${env.DEPLOYMENT_NAME} --timeout=120s"
+                    
+                    // Проверяем, что поды запустились
+                    runCmd "kubectl get pods"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline успешно завершен! Приложение развернуто в Kubernetes."
+        }
+        failure {
+            echo "Pipeline завершился с ошибкой. Проверьте логи."
         }
     }
 }
